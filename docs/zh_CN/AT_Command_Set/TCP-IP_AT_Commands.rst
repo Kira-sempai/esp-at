@@ -27,6 +27,7 @@ TCP/IP AT 命令
 -  :ref:`AT+CIPSNTPCFG <cmd-SNTPCFG>`：查询/设置时区和 SNTP 服务器
 -  :ref:`AT+CIPSNTPTIME <cmd-SNTPT>`：查询 SNTP 时间
 -  :ref:`AT+CIPSNTPINTV <cmd-SNTPINTV>`：查询/设置 SNTP 时间同步的间隔
+-  :ref:`AT+CIPFWVER <cmd-FWVER>`：查询服务器已有的 AT 固件版本
 -  :ref:`AT+CIUPDATE <cmd-UPDATE>`：通过 Wi-Fi 升级固件
 -  :ref:`AT+CIPDINFO <cmd-IPDINFO>`：设置 +IPD 消息详情
 -  :ref:`AT+CIPSSLCCONF <cmd-SSLCCONF>`：查询/设置 SSL 客户端配置
@@ -1530,6 +1531,41 @@ TCP/IP AT 命令
 
     OK
 
+.. _cmd-FWVER:
+
+:ref:`AT+CIPFWVER <TCPIP-AT>`：查询服务器已有的 AT 固件版本
+---------------------------------------------------------------------
+
+查询命令
+^^^^^^^^
+
+**功能：**
+
+查询服务器已有的 {IDF_TARGET_NAME} AT 固件版本
+
+**命令：**
+
+::
+
+    AT+CIPFWVER?
+
+**响应：**
+
+::
+
+    +CIPFWVER:<"version">
+
+    OK
+
+参数
+^^^^
+- **<"version">**：{IDF_TARGET_NAME} AT 固件版本
+
+说明
+^^^^
+
+- 在选择要升级的 OTA 版本时，强烈不建议从高版本向低版本升级。
+
 .. _cmd-UPDATE:
 
 :ref:`AT+CIUPDATE <TCPIP-AT>`：通过 Wi-Fi 升级固件
@@ -2135,7 +2171,7 @@ ESP-AT 在运行时，通过 Wi-Fi 从指定的服务器上下载新固件到某
 
 - **<mode>**：套接字数据接收模式，默认值：0。
    
-   - 0: 主动模式，ESP-AT 将所有接收到的套接字数据立即发送给主机 MCU，头为 "+IPD"。
+   - 0: 主动模式，ESP-AT 将所有接收到的套接字数据立即发送给主机 MCU，头为 "+IPD"（套接字接收窗口为 5760 字节，每次向 MCU 最大发送 2920 字节有效数据）。
    - 1: 被动模式，ESP-AT 将所有接收到的套接字数据保存到内部缓存区（套接字接收窗口，默认值为 5760 字节），等待 MCU 读取。对于 TCP 和 SSL 连接，如果缓存区满了，将阻止套接字传输；对于 UDP 传输，如果缓存区满了，则会发生数据丢失。
 
 说明

@@ -1,13 +1,20 @@
 编译 ESP-AT 工程
 =============================
 
-{IDF_TARGET_HYPHEN_LOWERCASE_NAME: default="undefined", esp32="esp32", esp32c3="esp32-c3"}
-{IDF_TARGET_COMPILE_MNAME: default="undefined", esp32="WROOM-32", esp32c3="MINI-1"}
-{IDF_TARGET_PRODUCT_NAME: default="undefined", esp32="ESP32-WROOM-32D", esp32c3="ESP32-C3-MINI-1"}
+{IDF_TARGET_HYPHEN_LOWERCASE_NAME: default="undefined", esp32="esp32", esp32c2="esp32-c2", esp32c3="esp32-c3"}
+{IDF_TARGET_COMPILE_MNAME: default="undefined", esp32="WROOM-32", esp32c2="ESP32C2-4MB", esp32c3="MINI-1"}
+{IDF_TARGET_PRODUCT_NAME: default="undefined", esp32="ESP32-WROOM-32D", esp32c2="ESP8684-MINI-1", esp32c3="ESP32-C3-MINI-1"}
+{IDF_TARGET_VER: default="undefined", esp32="4.3", esp32c2="5.0", esp32c3="4.3"}
 
 :link_to_translation:`en:[English]`
 
-本文档详细介绍了如何编译 ESP-AT 工程，并将生成的固件烧录到 {IDF_TARGET_NAME} 设备中。当默认的 :doc:`官方发布的固件 <../AT_Binary_Lists/index>` 无法满足需求时，如您需要自定义 :doc:`AT 端口管脚 <How_to_set_AT_port_pin>`、:doc:`低功耗蓝牙服务 <How_to_customize_BLE_services>` 以及 :doc:`分区 <How_to_customize_partitions>` 等，那么就需要编译 ESP-AT 工程。
+.. only:: esp32 or esp32c3
+
+  本文档详细介绍了如何编译 ESP-AT 工程，并将生成的固件烧录到 {IDF_TARGET_NAME} 设备中。当默认的 :doc:`官方发布的固件 <../AT_Binary_Lists/index>` 无法满足需求时，如您需要自定义 :doc:`AT 端口管脚 <How_to_set_AT_port_pin>`、:doc:`低功耗蓝牙服务 <How_to_customize_BLE_services>` 以及 :doc:`分区 <How_to_customize_partitions>` 等，那么就需要编译 ESP-AT 工程。
+
+.. only:: esp32c2
+
+  本文档详细介绍了如何编译 ESP-AT 工程，并将生成的固件烧录到 {IDF_TARGET_NAME} 设备中。当默认的 :doc:`官方发布的固件 <../AT_Binary_Lists/index>` 无法满足需求时，如您需要自定义 :doc:`AT 端口管脚 <How_to_set_AT_port_pin>` 以及 :doc:`分区 <How_to_customize_partitions>` 等，那么就需要编译 ESP-AT 工程。
 
 .. _esp-at-started-steps:
 
@@ -32,7 +39,7 @@
 
 在编译 ESP-AT 工程之前，请先学习使用 ESP-IDF，因为 ESP-AT 是基于 ESP-IDF 开发的。
 
-请您根据 `ESP-IDF v4.3 快速入门文档 <https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.3/{IDF_TARGET_PATH_NAME}/get-started/index.html>`__ 的指导，完成 ``hello_world`` 工程的配置、编译以及下载固件至 {IDF_TARGET_NAME} 开发板等步骤。
+请您根据 `ESP-IDF v{IDF_TARGET_VER} 快速入门文档 <https://docs.espressif.com/projects/esp-idf/zh_CN/release-v{IDF_TARGET_VER}/{IDF_TARGET_PATH_NAME}/get-started/index.html>`__ 的指导，完成 ``hello_world`` 工程的配置、编译以及下载固件至 {IDF_TARGET_NAME} 开发板等步骤。
 
 .. note::
 
@@ -58,7 +65,7 @@
 
 - Windows
 
-  对于 {IDF_TARGET_NAME} 系列模组，推荐您以管理员权限运行 `ESP-IDF 4.3 CMD <https://dl.espressif.com/dl/esp-idf/?idf=4.3>`__。
+  对于 {IDF_TARGET_NAME} 系列模组，推荐您以管理员权限运行 `ESP-IDF {IDF_TARGET_VER} CMD <https://dl.espressif.com/dl/esp-idf/?idf={IDF_TARGET_VER}>`__。
 
   ::
 
@@ -187,7 +194,7 @@ ESP-AT 将下载至 Linux 和 macOS 的 ``~/esp/esp-at``、Windows 的 ``%userpr
 build.py 进阶用法
 ^^^^^^^^^^^^^^^^^^^^^^
 
-``build.py`` 脚本是基于 `idf.py <https://docs.espressif.com/projects/esp-idf/zh_CN/release-v4.3/{IDF_TARGET_PATH_NAME}/api-guides/build-system.html#idf-py>`__ 封装的工具（即 ``idf.py <cmd>`` 功能均包含在 ``build.py <cmd>`` 里），您可以运行以下命令查看更多用法。
+``build.py`` 脚本是基于 `idf.py <https://docs.espressif.com/projects/esp-idf/zh_CN/release-v{IDF_TARGET_VER}/{IDF_TARGET_PATH_NAME}/api-guides/build-system.html#idf-py>`__ 封装的工具（即 ``idf.py <cmd>`` 功能均包含在 ``build.py <cmd>`` 里），您可以运行以下命令查看更多用法。
 
 - Linux 或 macOS
 

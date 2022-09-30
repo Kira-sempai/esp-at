@@ -71,10 +71,12 @@ set(FALLBACK_DNS_SERVER "8.8.8.8")
 add_compile_options("-DFALLBACK_DNS_SERVER_ADDRESS(p)=ipaddr_aton(\"${FALLBACK_DNS_SERVER}\",(p))")
 
 # add cmake flags
-### (unused typedefs, unused function, unused-but-set-variable) should not be treated as warnings and errors
+### (unused typedefs, unused variable, unused function, unused-but-set-variable) should not be treated as warnings and errors
 add_compile_options("-Wno-unused-local-typedefs")
+add_compile_options("-Wno-unused-variable")
 add_compile_options("-Wno-unused-function")
 add_compile_options("-Wno-unused-but-set-variable")
+add_compile_options("-Wno-format")
 
 include(${IDF_PATH}/tools/cmake/project.cmake)
 
@@ -87,8 +89,21 @@ else()
     add_custom_target(factory_bin)
 endif()
 
-file(MAKE_DIRECTORY $ENV{ESP_AT_PROJECT_PATH}/build/factory)
+# Create Compressed image bin
+if (CONFIG_BOOTLOADER_COMPRESSED_ENABLED)
+    add_custom_target(ota_image ALL DEPENDS app)
+    add_custom_command(TARGET ota_image
+    POST_BUILD
+    COMMAND ${PYTHON} $ENV{ESP_AT_PROJECT_PATH}/bootloader_components/tools/custom_ota_gen.py -hv v2 -i esp-at.bin
+    COMMAND ${CMAKE_COMMAND} -E copy_directory custom_ota_binaries compressed_ota_image
+    COMMENT "Creating Compressed image..."
+    )
+    add_dependencies(ota_image gen_project_binary)
+    add_dependencies(flash ota_image)
+endif()
 
+# Create factory bin
+file(MAKE_DIRECTORY $ENV{ESP_AT_PROJECT_PATH}/build/factory)
 add_custom_command(TARGET factory_bin
   POST_BUILD
   COMMAND ${PYTHON} $ENV{ESP_AT_PROJECT_PATH}/tools/esp_at_factory_bin_combine.py
@@ -101,6 +116,5 @@ add_custom_command(TARGET factory_bin
         --download_config $ENV{ESP_AT_PROJECT_PATH}/build/flash_project_args
   COMMENT "Create factory bin..."
 )
-
 add_dependencies(factory_bin gen_project_binary)
 add_dependencies(flash factory_bin)

@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "soc/io_mux_reg.h"
+#include "soc/gpio_periph.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "string.h"
@@ -42,6 +44,8 @@
 #include "esp32/rom/uart.h"
 #elif CONFIG_IDF_TARGET_ESP32C3
 #include "esp32c3/rom/uart.h"
+#elif CONFIG_IDF_TARGET_ESP32C2
+#include "esp32c2/rom/uart.h"
 #endif
 
 typedef struct {
@@ -74,6 +78,7 @@ static const uint8_t esp_at_uart_parity_table[] = {UART_PARITY_DISABLE, UART_PAR
 #endif
 #define AT_UART_BAUD_RATE_MAX                  5000000
 #define AT_UART_BAUD_RATE_MIN                       80
+
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
 #define CONFIG_AT_UART_PORT_TX_PIN_DEFAULT          7
 #define CONFIG_AT_UART_PORT_RX_PIN_DEFAULT          6
@@ -83,6 +88,25 @@ static const uint8_t esp_at_uart_parity_table[] = {UART_PARITY_DISABLE, UART_PAR
 #define CONFIG_AT_UART_PORT                         UART_NUM_1
 #endif
 #define AT_UART_BAUD_RATE_MAX                  5000000
+#define AT_UART_BAUD_RATE_MIN                       80
+
+#elif defined(CONFIG_IDF_TARGET_ESP32C2)
+#ifdef CONFIG_ESPTOOLPY_FLASHSIZE_2MB
+#define CONFIG_AT_UART_PORT_TX_PIN_DEFAULT          7
+#define CONFIG_AT_UART_PORT_RX_PIN_DEFAULT          6
+#define CONFIG_AT_UART_PORT_CTS_PIN_DEFAULT         19
+#define CONFIG_AT_UART_PORT_RTS_PIN_DEFAULT         20
+#else
+#define CONFIG_AT_UART_PORT_TX_PIN_DEFAULT          7
+#define CONFIG_AT_UART_PORT_RX_PIN_DEFAULT          6
+#define CONFIG_AT_UART_PORT_CTS_PIN_DEFAULT         5
+#define CONFIG_AT_UART_PORT_RTS_PIN_DEFAULT         4
+#endif
+
+#ifndef CONFIG_AT_UART_PORT
+#define CONFIG_AT_UART_PORT                         UART_NUM_1
+#endif
+#define AT_UART_BAUD_RATE_MAX                  2500000
 #define AT_UART_BAUD_RATE_MIN                       80
 #endif
 
@@ -104,7 +128,7 @@ static int32_t at_port_write_data(uint8_t*data,int32_t len)
 
 static int32_t at_port_read_data(uint8_t*buf,int32_t len)
 {
-    TickType_t ticks_to_wait = portTICK_RATE_MS;
+    TickType_t ticks_to_wait = portTICK_PERIOD_MS;
     uint8_t *data = NULL;
     size_t size = 0;
 
@@ -172,7 +196,7 @@ static void uart_task(void *pvParameters)
 
     for (;;) {
         //Waiting for UART event.
-        if (xQueueReceive(esp_at_uart_queue, (void * )&event, (portTickType)portMAX_DELAY)) {
+        if (xQueueReceive(esp_at_uart_queue, (void * )&event, (TickType_t)portMAX_DELAY)) {
 retry:
             switch (event.type) {
             //Event of UART receving data
@@ -181,7 +205,7 @@ retry:
                 data_len += event.size;
                 // we can put all data together to process
                 retry_flag = pdFALSE;
-                while (xQueueReceive(esp_at_uart_queue, (void * )&event, (portTickType)0) == pdTRUE) {
+                while (xQueueReceive(esp_at_uart_queue, (void * )&event, (TickType_t)0) == pdTRUE) {
                     if (event.type == UART_DATA) {
                         data_len += event.size;
                     } else if (event.type == UART_BUFFER_FULL) {
@@ -215,7 +239,7 @@ retry:
                 break;
             case UART_FIFO_OVF:
                 retry_flag = pdFALSE;
-                while (xQueueReceive(esp_at_uart_queue, (void *)&event, (portTickType)0) == pdTRUE) {
+                while (xQueueReceive(esp_at_uart_queue, (void *)&event, (TickType_t)0) == pdTRUE) {
                     if ((event.type == UART_DATA) || (event.type == UART_BUFFER_FULL) || (event.type == UART_FIFO_OVF)) {
                         // Put all data together to process
                     } else {
@@ -238,6 +262,7 @@ retry:
     }
     vTaskDelete(NULL);
 }
+
 static void at_uart_init(void)
 {
     at_nvm_uart_config_struct uart_nvm_config;
@@ -248,6 +273,11 @@ static void at_uart_init(void)
         .stop_bits = CONFIG_AT_UART_DEFAULT_STOPBITS,
         .flow_ctrl = CONFIG_AT_UART_DEFAULT_FLOW_CONTROL,
         .rx_flow_ctrl_thresh = 122,
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        .source_clk = UART_SCLK_DEFAULT,
+#else
+        .source_clk = UART_SCLK_APB,
+#endif
     };
 
     uart_intr_config_t intr_config = {
@@ -321,7 +351,7 @@ static void at_uart_init(void)
             if (data[5] != 0xFF) {
 #if defined(CONFIG_IDF_TARGET_ESP32)
                 assert((data[5] == 0) || (data[5] == 1) || (data[5] == 2));
-#elif defined(CONFIG_IDF_TARGET_ESP32C3)
+#elif defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C2)
                 assert((data[5] == 0) || (data[5] == 1));
 #endif
                 esp_at_uart_port = data[5];
@@ -587,7 +617,7 @@ static uint8_t at_queryCmdUartDef (uint8_t *cmd_name)
     return ESP_AT_RESULT_CODE_OK;
 }
 
-static esp_at_cmd_struct at_custom_cmd[] = {
+static const esp_at_cmd_struct at_custom_cmd[] = {
     {"+UART", NULL, at_queryCmdUart, at_setupCmdUartDef, NULL},
     {"+UART_CUR", NULL, at_queryCmdUart, at_setupCmdUart, NULL},
     {"+UART_DEF", NULL, at_queryCmdUartDef, at_setupCmdUartDef, NULL},

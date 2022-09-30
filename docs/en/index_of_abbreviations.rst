@@ -63,7 +63,7 @@ Index of Abbreviations
         * After sending the :ref:`AT+CIPSENDEX <cmd-SENDEX>` set command successfully and returns `>`.
         * After sending the :ref:`AT+SAVETRANSLINK <cmd-SAVET>` set command successfully and sending the :ref:`AT+RST <cmd-RST>` command and restart the module.
         :esp32: * After sending the :ref:`AT+BTSPPSEND <cmd-BTSPPSEND>` execute command successfully and returns `>`.
-        * After sending the :ref:`AT+BLESPP <cmd-BLESPP>` execute command successfully and returns `>`.
+        :esp32 or esp32c3: * After sending the :ref:`AT+BLESPP <cmd-BLESPP>` execute command successfully and returns `>`.
 
       In the data mode, send the :ref:`+++ <cmd-PLUS>` command, AT will exit from :term:`Data Mode` and enter the :term:`Command Mode`.
 
@@ -79,7 +79,7 @@ Index of Abbreviations
         * 发送 :ref:`AT+CIPSENDEX <cmd-SENDEX>` 设置命令成功，回复 `>` 之后
         * 发送 :ref:`AT+SAVETRANSLINK <cmd-SAVET>` 设置命令成功，再发送 (:ref:`AT+RST <cmd-RST>`) 命令，模组重启之后
         :esp32: * 发送 :ref:`AT+BTSPPSEND <cmd-BTSPPSEND>` 执行命令成功，回复 `>` 之后
-        * 发送 :ref:`AT+BLESPP <cmd-BLESPP>` 执行命令成功，回复 `>` 之后
+        :esp32 or esp32c3: * 发送 :ref:`AT+BLESPP <cmd-BLESPP>` 执行命令成功，回复 `>` 之后
 
       在数据模式下，发送 :ref:`+++ <cmd-PLUS>` 命令，会从 :term:`数据模式` 退出，进入 :term:`命令模式`。
 
@@ -95,7 +95,7 @@ Index of Abbreviations
         * After sending the :ref:`AT+CIPSENDEX <cmd-SENDEX>` set command successfully and returns `>`.
         * After sending the :ref:`AT+SAVETRANSLINK <cmd-SAVET>` set command successfully and sending the :ref:`AT+RST <cmd-RST>` command and restart the module.
         :esp32: * After sending the :ref:`AT+BTSPPSEND <cmd-BTSPPSEND>` execute command successfully and returns `>`.
-        * After sending the :ref:`AT+BLESPP <cmd-BLESPP>` execute command successfully and returns `>`.
+        :esp32 or esp32c3: * After sending the :ref:`AT+BLESPP <cmd-BLESPP>` execute command successfully and returns `>`.
 
       In the data mode, send the :ref:`+++ <cmd-PLUS>` command, AT will exit from :term:`Data Mode` and enter the :term:`Command Mode`.
 
@@ -111,7 +111,7 @@ Index of Abbreviations
         * 发送 :ref:`AT+CIPSENDEX <cmd-SENDEX>` 设置命令成功，回复 `>` 之后
         * 发送 :ref:`AT+SAVETRANSLINK <cmd-SAVET>` 设置命令成功，再发送 :ref:`AT+RST <cmd-RST>` 命令，模组重启之后
         :esp32: * 发送 :ref:`AT+BTSPPSEND <cmd-BTSPPSEND>` 执行命令成功，回复 `>` 之后
-        * 发送 :ref:`AT+BLESPP <cmd-BLESPP>` 执行命令成功，回复 `>` 之后
+        :esp32 or esp32c3: * 发送 :ref:`AT+BLESPP <cmd-BLESPP>` 执行命令成功，回复 `>` 之后
 
       在数据模式下，发送 :ref:`+++ <cmd-PLUS>` 命令，会从 :term:`数据模式` 退出，进入 :term:`命令模式`。
 
@@ -208,6 +208,15 @@ Index of Abbreviations
       普通传输模式时，如果连接断开，{IDF_TARGET_NAME} 不会重连，并提示连接断开。
 
       更多介绍请参考 :term:`Transmission Mode Shift Diagram`。
+
+    OWE
+      Opportunistic Wireless Encryption. OWE is a Wi-Fi standard which ensures that the communication between each pair of endpoints is protected from other endpoints.
+
+      More details are in `Wikipedia <https://en.wikipedia.org/wiki/Opportunistic_Wireless_Encryption>`__.
+
+      机会性无线加密。OWE 是一种 Wi-Fi 标准，它确保每对端点之间的通信受到保护，不受其他端点的影响。
+
+      更多介绍请参考 `维基百科 <https://en.wikipedia.org/wiki/Opportunistic_Wireless_Encryption>`__。
 
     Passthrough Mode
       Also called as "Passthrough Sending & Receiving Mode".

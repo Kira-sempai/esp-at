@@ -35,6 +35,11 @@
 #include "driver/gpio.h"
 #endif
 
+#ifdef CONFIG_BOOTLOADER_COMPRESSED_ENABLED
+#include "at_compress_ota.h"
+#endif
+
+#include "esp_idf_version.h"
 #include "esp_http_client.h"
 #include "esp_https_ota.h"
 #include "esp_at_core.h"
@@ -103,7 +108,7 @@ static uint32_t s_user_ram_size = 0;
 static int32_t s_user_ota_total_size = 0;
 static int32_t s_user_ota_recv_size = 0;
 static bool s_user_ota_is_chunked = true;
-static xSemaphoreHandle s_at_user_sync_sema;
+static SemaphoreHandle_t s_at_user_sync_sema;
 
 static void at_user_wait_data_cb(void)
 {
@@ -303,6 +308,8 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
     case HTTP_EVENT_DISCONNECTED:
         printf("http(https) disconnected\r\n");
         break;
+    default:
+        break;
     }
 
     return ESP_OK;
@@ -377,10 +384,23 @@ static uint8_t at_setup_cmd_userota(uint8_t para_num)
         .url = (const char*)url,
         .event_handler = _http_event_handler,
         .keep_alive_enable = true,
+        .timeout_ms = 10000,
         .buffer_size = 2048,
     };
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#ifdef CONFIG_BOOTLOADER_COMPRESSED_ENABLED
+    esp_err_t ret = at_compress_https_ota(&config);
+#else
+    esp_https_ota_config_t ota_config = {
+        .http_config = &config,
+    };
+
+    esp_err_t ret = esp_https_ota(&ota_config);
+#endif
+#else
     esp_err_t ret = esp_https_ota(&config);
+#endif
 
     free(url);
 

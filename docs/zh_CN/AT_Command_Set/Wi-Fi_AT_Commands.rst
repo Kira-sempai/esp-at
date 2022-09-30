@@ -16,7 +16,7 @@ Wi-Fi AT 命令集
 -  :ref:`AT+CWLIF <cmd-LIF>`：查询连接到 {IDF_TARGET_NAME} SoftAP 的 station 信息
 -  :ref:`AT+CWQIF <cmd-QIF>`：断开 station 与 {IDF_TARGET_NAME} SoftAP 的连接
 -  :ref:`AT+CWDHCP <cmd-DHCP>`：启用/禁用 DHCP
--  :ref:`AT+CWDHCPS <cmd-DHCPS>`：查询/设置 {IDF_TARGET_NAME} SoftAP DHCP 分配的 IP 地址范围
+-  :ref:`AT+CWDHCPS <cmd-DHCPS>`：查询/设置 {IDF_TARGET_NAME} SoftAP DHCP 分配的 IPv4 地址范围
 -  :ref:`AT+CWAUTOCONN <cmd-AUTOC>`：上电是否自动连接 AP
 -  :ref:`AT+CWAPPROTO <cmd-APPROTO>`：查询/设置 SoftAP 模式下 802.11 b/g/n 协议标准
 -  :ref:`AT+CWSTAPROTO <cmd-STAPROTO>`：设置 Station 模式下 802.11 b/g/n 协议标准
@@ -438,6 +438,10 @@ Wi-Fi AT 命令集
    -  bit 7: 是否显示 ``WPA2_WPA3_PSK`` 认证方式的 AP
    -  bit 8: 是否显示 ``WAPI_PSK`` 认证方式的 AP
 
+   .. only:: esp32c2
+
+       -  bit 9: 是否显示 ``OWE`` 认证方式的 AP
+
 示例
 ^^^^
 
@@ -504,6 +508,7 @@ Wi-Fi AT 命令集
    -  6: WPA3_PSK
    -  7: WPA2_WPA3_PSK
    -  8: WAPI_PSK
+   -  9: OWE
 
 -  **<ssid>**：字符串参数，AP 的 SSID
 -  **<rssi>**：信号强度
@@ -802,10 +807,10 @@ Wi-Fi AT 命令集
 说明
 ^^^^
 -  若 :ref:`AT+SYSSTORE=1 <cmd-SYSSTORE>`，配置更改将保存到 NVS 分区
--  本设置命令与设置静态 IP 地址的命令会相互影响，如 :ref:`AT+CIPSTA <cmd-IPSTA>` 和 :ref:`AT+CIPAP <cmd-IPAP>`
+-  本设置命令与设置静态 IPv4 地址的命令会相互影响，如 :ref:`AT+CIPSTA <cmd-IPSTA>` 和 :ref:`AT+CIPAP <cmd-IPAP>`
 
-   -  若启用 DHCP，则静态 IP 地址会被禁用
-   -  若启用静态 IP，则 DHCP 会被禁用
+   -  若启用 DHCP，则静态 IPv4 地址会被禁用
+   -  若启用静态 IPv4，则 DHCP 会被禁用
    -  最后一次配置会覆盖上一次配置
 
 示例
@@ -821,7 +826,7 @@ Wi-Fi AT 命令集
 
 .. _cmd-DHCPS:
 
-:ref:`AT+CWDHCPS <WiFi-AT>`：查询/设置 {IDF_TARGET_NAME} SoftAP DHCP 分配的 IP 地址范围
+:ref:`AT+CWDHCPS <WiFi-AT>`：查询/设置 {IDF_TARGET_NAME} SoftAP DHCP 分配的 IPv4 地址范围
 -----------------------------------------------------------------------------------------------
 
 查询命令
@@ -845,7 +850,7 @@ Wi-Fi AT 命令集
 
 **功能：**
 
-设置 {IDF_TARGET_NAME} SoftAP DHCP 服务器分配的 IP 地址范围
+设置 {IDF_TARGET_NAME} SoftAP DHCP 服务器分配的 IPv4 地址范围
 
 **命令：**
 
@@ -868,15 +873,15 @@ Wi-Fi AT 命令集
    -  0: 清除 DHCP server 信息，恢复默认值，后续参数无需填写
 
 -  **<lease time>**：租约时间，单位：分钟，取值范围：[1,2880]
--  **<start IP>**：{IDF_TARGET_NAME} SoftAP DHCP 服务器 IP 地址池的起始 IP
--  **<end IP>**：{IDF_TARGET_NAME} SoftAP DHCP 服务器 IP 地址池的结束 IP
+-  **<start IP>**：{IDF_TARGET_NAME} SoftAP DHCP 服务器 IPv4 地址池的起始 IP
+-  **<end IP>**：{IDF_TARGET_NAME} SoftAP DHCP 服务器 IPv4 地址池的结束 IP
 
 说明
 ^^^^
 
 -  若 :ref:`AT+SYSSTORE=1 <cmd-SYSSTORE>`，配置更改将保存到 NVS 分区
 -  本命令必须在 {IDF_TARGET_NAME} SoftAP 模式使能，且开启 DHCP server 的情况下使用
--  设置的 IP 地址范围必须与 {IDF_TARGET_NAME} SoftAP 在同一网段
+-  设置的 IPv4 地址范围必须与 {IDF_TARGET_NAME} SoftAP 在同一网段
 
 示例
 ^^^^
@@ -1086,7 +1091,7 @@ Wi-Fi AT 命令集
   
   - 若 :ref:`AT+SYSSTORE=1 <cmd-SYSSTORE>`，配置更改将保存到 NVS 分区
   :esp32: - {IDF_TARGET_NAME} Station 的 MAC 地址与 {IDF_TARGET_NAME} Ethernet 和 {IDF_TARGET_NAME} SoftAP 不同，不要为二者设置同样的 MAC 地址
-  :esp32c3: - {IDF_TARGET_NAME} Station 的 MAC 地址与 {IDF_TARGET_NAME} SoftAP 不同，不要为二者设置同样的 MAC 地址
+  :esp32c2 or esp32c3: - {IDF_TARGET_NAME} Station 的 MAC 地址与 {IDF_TARGET_NAME} SoftAP 不同，不要为二者设置同样的 MAC 地址
   - MAC 地址的 Bit 0 不能为 1，例如，MAC 地址可以是 "1a:…"，但不可以是 "15:…"
   - FF:FF:FF:FF:FF:FF 和 00:00:00:00:00:00 是无效地址，不能设置
 
@@ -1227,8 +1232,8 @@ Wi-Fi AT 命令集
 -  若 :ref:`AT+SYSSTORE=1 <cmd-SYSSTORE>`，配置更改将保存到 NVS 分区
 -  本设置命令与设置 DHCP 的命令相互影响，如 :ref:`AT+CWDHCP <cmd-DHCP>`
 
-   -  若启用静态 IP 地址，则禁用 DHCP
-   -  若启用 DHCP，则禁用静态 IP 地址
+   -  若启用静态 IPv4 地址，则禁用 DHCP
+   -  若启用 DHCP，则禁用静态 IPv4 地址
    -  最后一次配置会覆盖上一次配置
 
 示例
@@ -1264,7 +1269,6 @@ Wi-Fi AT 命令集
     +CIPAP:gateway:<"gateway">
     +CIPAP:netmask:<"netmask">
     +CIPAP:ip6ll:<"ipv6 addr">
-    +CIPAP:ip6gl:<"ipv6 addr">
 
     OK
 
@@ -1298,11 +1302,12 @@ Wi-Fi AT 命令集
 说明
 ^^^^
 
+-  本设置命令仅适用于 IPv4 网络，不适用于 IPv6 网络
 -  若 :ref:`AT+SYSSTORE=1 <cmd-SYSSTORE>`，配置更改将保存到 NVS 分区
 -  本设置命令与设置 DHCP 的命令相互影响，如 :ref:`AT+CWDHCP <cmd-DHCP>`
 
-   -  若启用静态 IP 地址，则禁用 DHCP
-   -  若启用 DHCP，则禁用静态 IP 地址
+   -  若启用静态 IPv4 地址，则禁用 DHCP
+   -  若启用 DHCP，则禁用静态 IPv4 地址
    -  最后一次配置会覆盖上一次配置
 
 示例

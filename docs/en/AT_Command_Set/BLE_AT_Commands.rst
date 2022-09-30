@@ -378,7 +378,7 @@ Enable/disable scanning.
 
 ::
 
-    AT+BLESCAN=<enable>[,<interval>][,<filter_type>,<filter_param>]
+    AT+BLESCAN=<enable>[,<duration>][,<filter_type>,<filter_param>]
 
 **Response:**
 
@@ -395,7 +395,7 @@ Parameters
    -  1: enable continuous scanning.
    -  0: disable continuous scanning.
 
--  **[<interval>]**: optional parameter. Unit: second.
+-  **[<duration>]**: optional parameter. Unit: second.
 
    -  If you want to disable the scanning, this parameter should be omitted.
    -  If you want to enable the scanning, set a value for this parameter:
@@ -752,6 +752,7 @@ Notes
 -  If advertising parameters are NOT set by command :ref:`AT+BLEADVPARAM <cmd-BADVP>`\=<adv_parameter>, the default parameters will be used.
 -  If advertising data is NOT set by command :ref:`AT+BLEADVDATA <cmd-BADVD>`\=<adv_data>, the advertising playload will be empty.
 -  If advertising data is preset by command :ref:`AT+BLEADVDATA <cmd-BADVD>`\=<adv_data>, it will be overwritten by :ref:`AT+BLEADVDATAEX <cmd-BADVDEX>`\=<dev_name>,<uuid>,<manufacturer_data>,<include_power> and vice versa.
+-  After the start of Bluetooth LE advertisement, if no connection is established, the advertisement will keep going on; if a connection is established, the advertisement will automatically end.
 
 Example
 ^^^^^^^^

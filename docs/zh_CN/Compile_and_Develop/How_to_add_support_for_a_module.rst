@@ -31,6 +31,10 @@ ESP-AT 工程支持多个模组，并提供了模组的配置文件：:component
      - ESP32_QCLOUD
      - - :project_file:`module_config/module_esp32_qcloud/sdkconfig.defaults`
        - :project_file:`module_config/module_esp32_qcloud/sdkconfig_silence.defaults`
+   * - ESP32-C2
+     - ESP32C2-4MB（所有带 4 MB flash 的 ESP32C2（ESP8684） 系列）
+     - - :project_file:`module_config/module_esp32c2_default/sdkconfig.defaults`
+       - :project_file:`module_config/module_esp32c2_default/sdkconfig_silence.defaults`
    * - ESP32-C3
      - MINI-1
      - - :project_file:`module_config/module_esp32c3_default/sdkconfig.defaults`

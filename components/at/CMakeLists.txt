@@ -1,14 +1,39 @@
 
-set(require_components ${IDF_TARGET} mqtt mdns esp_http_client esp_https_ota json freertos spiffs
-    bootloader_support app_update openssl wpa_supplicant spi_flash esp_http_server)
+set(require_components mqtt mdns esp_http_client esp_https_ota json freertos spiffs
+    bootloader_support app_update wpa_supplicant spi_flash esp_http_server)
 
 if ("${IDF_TARGET}" STREQUAL "esp32")
     list(APPEND require_components bt fatfs)
 elseif ("${IDF_TARGET}" STREQUAL "esp32c3")
     list(APPEND require_components bt fatfs)
+elseif ("${IDF_TARGET}" STREQUAL "esp32c2")
+    list(APPEND require_components bt fatfs)
 endif()
 
-file(GLOB_RECURSE srcs src/*.c)
+# collect the source file to be compiled
+set(srcs "src/at_default_config.c")
+if (CONFIG_BOOTLOADER_COMPRESSED_ENABLED)
+    list(APPEND srcs "src/at_compress_ota.c")
+endif()
+if (CONFIG_AT_ETHERNET_SUPPORT)
+    list(APPEND srcs "src/at_eth_init.c")
+endif()
+if (CONFIG_AT_SIGNALING_COMMAND_SUPPORT)
+    list(APPEND srcs "src/at_fact_cmd.c")
+endif()
+if (CONFIG_AT_BT_A2DP_COMMAND_SUPPORT)
+    list(APPEND srcs "src/at_i2s.c")
+endif()
+if (CONFIG_AT_OTA_SUPPORT)
+    list(APPEND srcs "src/at_ota_cmd.c")
+endif()
+if (CONFIG_AT_USER_COMMAND_SUPPORT)
+    list(APPEND srcs "src/at_user_cmd.c")
+endif()
+if (CONFIG_AT_WEB_SERVER_SUPPORT)
+    list(APPEND srcs "src/at_web_dns_server.c")
+    list(APPEND srcs "src/at_web_server_cmd.c")
+endif()
 
 if (CONFIG_AT_WEB_SERVER_SUPPORT)
     if(NOT CONFIG_AT_WEB_USE_FATFS)
@@ -16,9 +41,15 @@ if (CONFIG_AT_WEB_SERVER_SUPPORT)
     endif()
 endif()
 
+set(includes "include")
+
+if (CONFIG_BOOTLOADER_COMPRESSED_ENABLED)
+    list(APPEND includes "${CMAKE_SOURCE_DIR}/bootloader_components/include")
+endif()
+
 idf_component_register (
     SRCS ${srcs}
-    INCLUDE_DIRS include
+    INCLUDE_DIRS ${includes}
     PRIV_INCLUDE_DIRS private_include
     REQUIRES ${require_components}
     EMBED_TXTFILES ${embed_txt_files})

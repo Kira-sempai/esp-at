@@ -63,7 +63,16 @@ SPI AT 默认管脚
 使用 SPI AT
 --------------
 
-在使用 SPI AT 时，{IDF_TARGET_NAME} 设备上运行的 SPI slave 工作在半双工通信模式下。通常，在使用 SPI 协议进行半双工通信时，由 SPI master 启动对 SPI slave 的读/写操作，但是，使用 AT 命令进行数据交互时，需要 {IDF_TARGET_NAME} 设备主动能够主动上报一些信息。因此，我们在 SPI master 和 slave 之间添加了一个握手线，来实现 slave 主动向 master 上报信息的功能。使用握手线的具体方法为：
+在使用 SPI AT 时，{IDF_TARGET_NAME} 设备上运行的 SPI slave 工作在半双工通信模式下。
+
+握手线 (handshake line)
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+SPI 是一种 master-slave 结构的外设，所有的传输均由 master 发起，slave 无法主动传输数据。但是，使用 AT 命令进行数据交互时，需要 {IDF_TARGET_NAME} 设备主动能够主动上报一些信息。因此，我们在 SPI master 和 slave 之间添加了一个握手线，来实现 slave 主动向 master 上报信息的功能。
+
+当 slave 需要传输数据时，将会把握手管脚主动拉高，这会在 master 侧产生一个上升沿的 GPIO 中断，master 发起与 slave 的通信，传输完成后，slave 将握手管脚拉低，结束此次通信。 
+
+使用握手线的具体方法为：
 
 - Master 向 slave 发送 AT 数据时，使用握手线的方法为：
 
@@ -181,7 +190,7 @@ SPI AT 的通信格式为 CMD+ADDR+DUMMY+DATA（读/写）。在使用 SPI AT �
 
 1. slave 需要向 master 发送的数据的字节数，长度 0～15 bit；仅当 slave 处于可读状态时，该字段数字有效。
 2. 数据包序列号，长度 16～23 bit，当序列号达到最大值 0xFF 时，下一个数据包的序列号重新设置为 0x0。当 slave 处于可写状态时，该字段为 master 需向 slave 发送的下一下数据包的序列号；当 slave 处于可读状态时，该字段为 slave 向 master 发送的下一个数据包的序列号。
-3. slave 的可读/可写状态，长度 24～31 bit。
+3. slave 的可读/可写状态，长度 24～31 bit， 其中，0x1 代表可读， 0x2 代表可写。
 
 SPI AT 数据交互流程
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -232,10 +241,12 @@ SPI AT 数据交互流程主要分为两个方面：
 3. master 开始接收来自 slave 的数据。
 4. 数据接收完毕后，master 向 slave 发送一条代表接收数据结束的消息。
 
-SPI AT Master 示例代码
-^^^^^^^^^^^^^^^^^^^^^^
+SPI AT 对应的 SPI master 侧示例代码
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-使用 SPI master 与 {IDF_TARGET_NAME} 设备运行的 SPI slave 进行通信的示例代码请参考 :example:` AT ESP32 SPI Master 例程 <at_spi_master/spi/esp32_c_series>`。
+SPI AT 本身是作为 SPI slave 使用的，使用 SPI master 与 SPI slave 进行通信的示例代码请参考 :example:`at_spi_master/spi/esp32_c_series`。
+
+**说明** 1. 在使用 MCU 开发之前，强烈建议使用 ESP32-C3 或者 ESP32 模拟 MCU 作为 SPI master 来运行此示例，以方便在出现问题时更容易调试问题。
 
 SPI AT 速率
 --------------
@@ -243,7 +254,7 @@ SPI AT 速率
 测试说明
 ^^^^^^^^^
 
-- 使用 ESP32-DevKitC 开发板作为 SPI master，运行 `ESP-AT <https://github.com/espressif/esp-at>`_ 中的 :example:`at_spi_master/spi/esp32_c_series` 目录的代码。其软硬件配置如下：
+- 使用 ESP32 或者 ES32-C3 开发板作为 SPI master，运行 `ESP-AT <https://github.com/espressif/esp-at>`_ 中的 :example:`at_spi_master/spi/esp32_c_series` 目录的代码。其软硬件配置如下：
 
 1. 硬件：CPU 工作频率设置为 240 MHz，flash SPI mode 配置为 QIO 模式，flash 频率设置为 40 MHz。
 

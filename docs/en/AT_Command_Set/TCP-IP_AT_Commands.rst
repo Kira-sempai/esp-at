@@ -27,6 +27,7 @@ TCP/IP AT Commands
 -  :ref:`AT+CIPSNTPCFG <cmd-SNTPCFG>`: Query/Set the time zone and SNTP server.
 -  :ref:`AT+CIPSNTPTIME <cmd-SNTPT>`: Query the SNTP time.
 -  :ref:`AT+CIPSNTPINTV <cmd-SNTPINTV>`: Query/Set the SNTP time synchronization interval.
+-  :ref:`AT+CIPFWVER <cmd-FWVER>`: Query the existing AT firmware version on the server.
 -  :ref:`AT+CIUPDATE <cmd-UPDATE>`: Upgrade the firmware through Wi-Fi.
 -  :ref:`AT+CIPDINFO <cmd-IPDINFO>`: Set "+IPD" message mode.
 -  :ref:`AT+CIPSSLCCONF <cmd-SSLCCONF>`: Query/Set SSL clients.
@@ -1530,6 +1531,41 @@ Example
 
     OK
 
+.. _cmd-FWVER:
+
+:ref:`AT+CIPFWVER <TCPIP-AT>`: Query the Existing AT Firmware Version on the Server
+-----------------------------------------------------------------------------------
+
+Query Command
+^^^^^^^^^^^^^
+
+**Function:**
+
+Query the existing {IDF_TARGET_NAME} AT firmware version on the server.
+
+**Command:**
+
+::
+
+    AT+CIPFWVER?
+
+**Response:**
+
+::
+
+    +CIPFWVER:<"version">
+
+    OK
+
+Parameters
+^^^^^^^^^^
+- **<"version">**: {IDF_TARGET_NAME} AT firmware version.
+
+Notes
+^^^^^
+
+- When selecting the OTA version to be upgraded, it is strongly not recommended to upgrade from a high version to a low version.
+
 .. _cmd-UPDATE:
 
 :ref:`AT+CIUPDATE <TCPIP-AT>`: Upgrade Firmware Through Wi-Fi
@@ -2135,7 +2171,7 @@ Parameter
 
 - **<mode>**: the receive mode of socket data. Default: 0.
    
-   - 0: active mode. ESP-AT will send all the received socket data instantly to the host MCU with header "+IPD".
+   - 0: active mode. ESP-AT will send all the received socket data instantly to the host MCU with the header "+IPD". (The socket receive window is 5760 bytes by default. The maximum valid bytes sent to MCU is 2920 bytes each time.)
    - 1: passive mode. ESP-AT will keep the received socket data in an internal buffer (socket receive window, 5760 bytes by default), and wait for the host MCU to read. If the buffer is full, the socket transmission will be blocked for TCP/SSL connections, or data will be lost for UDP connections.
 
 Notes
